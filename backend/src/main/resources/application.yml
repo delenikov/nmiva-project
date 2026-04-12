@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: nmiva
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/nmiva}
+    username: ${SPRING_DATASOURCE_USERNAME:nmiva}
+    password: ${SPRING_DATASOURCE_PASSWORD:nmiva}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
