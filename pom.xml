@@ -33,6 +33,7 @@
     <mapstruct.version>1.6.3</mapstruct.version>
     <postgresql.version>42.7.10</postgresql.version>
     <lombok.version>1.18.42</lombok.version>
+    <web-push.version>5.1.2</web-push.version>
   </properties>
 
   <dependencyManagement>
@@ -91,6 +92,11 @@
         <groupId>org.mapstruct</groupId>
         <artifactId>mapstruct-processor</artifactId>
         <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.martijndwars</groupId>
+        <artifactId>web-push</artifactId>
+        <version>${web-push.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
