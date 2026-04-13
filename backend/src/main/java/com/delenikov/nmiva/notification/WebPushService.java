@@ -13,6 +13,7 @@ import nl.martijndwars.webpush.Utils;
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -68,6 +69,7 @@ public class WebPushService {
     log.info("Subscription saved successfully for userId={}, endpoint={}", userId, request.endpoint());
   }
 
+  @Transactional
   public void unsubscribe(Long userId, String endpoint) {
     if (endpoint == null || endpoint.isBlank()) {
       repository.deleteByUserId(userId);

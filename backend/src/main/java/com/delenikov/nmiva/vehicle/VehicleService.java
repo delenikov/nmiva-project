@@ -15,7 +15,8 @@ public class VehicleService {
 
   @Transactional(readOnly = true)
   public List<VehicleDtos.VehicleResponse> list(Long userId) {
-    return vehicleRepository.findByUserIdAndDeletedFalseOrderByUpdatedAtDesc(userId).stream()
+    return vehicleRepository.findByUserIdAndDeletedFalseOrderByUpdatedAtDesc(userId)
+        .stream()
         .map(this::toResponse)
         .toList();
   }

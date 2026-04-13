@@ -6,6 +6,10 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:nmiva}
     password: ${SPRING_DATASOURCE_PASSWORD:nmiva}
     driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -15,3 +19,24 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:change-me-change-me-change-me-change-me}
+    expiration-minutes: ${APP_JWT_EXPIRATION_MINUTES:1440}
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  push:
+    subject: ${APP_PUSH_SUBJECT:mailto:delenikov.stojan@gmail.com}
+    public-key: ${APP_PUSH_PUBLIC_KEY:BNqacTJj2ZddeM5Wa7r2XTlXbmxSguqGuBjIrsxRWX-hngqRFAtlJ7p8r3LXxpJgmHGPdHkr7d7qcxaeuY7NJs0}
+    private-key: ${APP_PUSH_PRIVATE_KEY:bTlmzDJsLSVGMXuCG1-3WxMFklfH3RYHhk3DYlu1bX0}
+  reminder:
+    cron: ${APP_REMINDER_CRON:0 */30 * * * *}
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
