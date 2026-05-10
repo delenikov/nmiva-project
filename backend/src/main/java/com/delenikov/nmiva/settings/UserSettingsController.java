@@ -17,14 +17,14 @@ public class UserSettingsController {
   private final UserSettingsService userSettingsService;
 
   @GetMapping
-  public UserSettingsDtos.UserSettingsResponse get(@AuthenticationPrincipal AuthenticatedUser user) {
+  public UserSettingsResponse get(@AuthenticationPrincipal AuthenticatedUser user) {
     return userSettingsService.getForUser(user.id());
   }
 
   @PutMapping
-  public UserSettingsDtos.UserSettingsResponse update(
+  public UserSettingsResponse update(
       @AuthenticationPrincipal AuthenticatedUser user,
-      @Valid @RequestBody UserSettingsDtos.UpdateSettingsRequest request
+      @Valid @RequestBody UpdateSettingsRequest request
   ) {
     return userSettingsService.update(user.id(), request);
   }

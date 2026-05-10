@@ -21,7 +21,7 @@ public class EntryController {
   private final EntryService entryService;
 
   @GetMapping("/api/vehicles/{vehicleId}/entries")
-  public List<EntryDtos.EntryResponse> listForVehicle(
+  public List<EntryResponse> listForVehicle(
       @AuthenticationPrincipal AuthenticatedUser user,
       @PathVariable Long vehicleId,
       @RequestParam(required = false) String type
@@ -30,19 +30,19 @@ public class EntryController {
   }
 
   @PostMapping("/api/vehicles/{vehicleId}/entries")
-  public EntryDtos.EntryResponse create(
+  public EntryResponse create(
       @AuthenticationPrincipal AuthenticatedUser user,
       @PathVariable Long vehicleId,
-      @Valid @RequestBody EntryDtos.EntryRequest request
+      @Valid @RequestBody EntryRequest request
   ) {
     return entryService.create(user.id(), vehicleId, request);
   }
 
   @PutMapping("/api/entries/{id}")
-  public EntryDtos.EntryResponse update(
+  public EntryResponse update(
       @AuthenticationPrincipal AuthenticatedUser user,
       @PathVariable Long id,
-      @Valid @RequestBody EntryDtos.EntryRequest request
+      @Valid @RequestBody EntryRequest request
   ) {
     return entryService.update(user.id(), id, request);
   }
@@ -53,12 +53,12 @@ public class EntryController {
   }
 
   @GetMapping("/api/reminders/upcoming")
-  public List<EntryDtos.ReminderResponse> upcoming(@AuthenticationPrincipal AuthenticatedUser user) {
+  public List<ReminderResponse> upcoming(@AuthenticationPrincipal AuthenticatedUser user) {
     return entryService.upcomingReminders(user.id());
   }
 
   @GetMapping("/api/reminders/overdue")
-  public List<EntryDtos.ReminderResponse> overdue(@AuthenticationPrincipal AuthenticatedUser user) {
+  public List<ReminderResponse> overdue(@AuthenticationPrincipal AuthenticatedUser user) {
     return entryService.overdueReminders(user.id());
   }
 }

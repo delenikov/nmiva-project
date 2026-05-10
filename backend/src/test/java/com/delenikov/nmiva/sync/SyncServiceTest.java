@@ -46,7 +46,7 @@ class SyncServiceTest {
     existing.setOdometerStart(BigDecimal.valueOf(100000));
     existing.setLastModifiedAt(Instant.parse("2026-04-12T10:00:00Z"));
 
-    SyncDtos.ChangeRecord change = new SyncDtos.ChangeRecord(
+    ChangeRecord change = new ChangeRecord(
         "vehicle-local-1",
         7L,
         SyncOperation.UPDATE,
@@ -58,9 +58,9 @@ class SyncServiceTest {
     when(vehicleService.changesSince(1L, null)).thenReturn(List.of());
     when(entryService.changesSince(1L, null)).thenReturn(List.of());
 
-    SyncDtos.SyncResponse response = syncService.sync(
+    SyncResponse response = syncService.sync(
         1L,
-        new SyncDtos.SyncRequest(null, List.of(change), List.of())
+        new SyncRequest(null, List.of(change), List.of())
     );
 
     assertThat(response.acknowledgements()).hasSize(1);

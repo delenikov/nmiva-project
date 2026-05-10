@@ -21,23 +21,23 @@ public class VehicleController {
   private final VehicleService vehicleService;
 
   @GetMapping
-  public List<VehicleDtos.VehicleResponse> list(@AuthenticationPrincipal AuthenticatedUser user) {
+  public List<VehicleResponse> list(@AuthenticationPrincipal AuthenticatedUser user) {
     return vehicleService.list(user.id());
   }
 
   @PostMapping
-  public VehicleDtos.VehicleResponse create(
+  public VehicleResponse create(
       @AuthenticationPrincipal AuthenticatedUser user,
-      @Valid @RequestBody VehicleDtos.VehicleRequest request
+      @Valid @RequestBody VehicleRequest request
   ) {
     return vehicleService.create(user.id(), request);
   }
 
   @PutMapping("/{id}")
-  public VehicleDtos.VehicleResponse update(
+  public VehicleResponse update(
       @AuthenticationPrincipal AuthenticatedUser user,
       @PathVariable Long id,
-      @Valid @RequestBody VehicleDtos.VehicleRequest request
+      @Valid @RequestBody VehicleRequest request
   ) {
     return vehicleService.update(id, user.id(), request);
   }

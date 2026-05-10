@@ -16,9 +16,9 @@ public class SyncController {
   private final SyncService syncService;
 
   @PostMapping
-  public SyncDtos.SyncResponse sync(
+  public SyncResponse sync(
       @AuthenticationPrincipal AuthenticatedUser user,
-      @Valid @RequestBody SyncDtos.SyncRequest request
+      @Valid @RequestBody SyncRequest request
   ) {
     return syncService.sync(user.id(), request);
   }

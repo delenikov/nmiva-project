@@ -40,7 +40,7 @@ public class WebPushService {
         && normalizedPrivateKey != null && !normalizedPrivateKey.isBlank();
   }
 
-  public void subscribe(Long userId, PushDtos.PushSubscriptionRequest request) {
+  public void subscribe(Long userId, PushSubscriptionRequest request) {
 
     log.info("Subscribe request received for userId={}, endpoint={}", userId, request.endpoint());
 

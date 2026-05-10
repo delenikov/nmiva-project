@@ -15,10 +15,7 @@ public class DashboardController {
   private final DashboardService dashboardService;
 
   @GetMapping
-  public DashboardDtos.DashboardResponse dashboard(
-      @AuthenticationPrincipal AuthenticatedUser user,
-      @PathVariable Long vehicleId
-  ) {
+  public DashboardResponse dashboard(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable Long vehicleId) {
     return dashboardService.getDashboard(user.id(), vehicleId);
   }
 }

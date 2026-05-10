@@ -14,7 +14,7 @@ public class VehicleService {
   private final VehicleRepository vehicleRepository;
 
   @Transactional(readOnly = true)
-  public List<VehicleDtos.VehicleResponse> list(Long userId) {
+  public List<VehicleResponse> list(Long userId) {
     return vehicleRepository.findByUserIdAndDeletedFalseOrderByUpdatedAtDesc(userId)
         .stream()
         .map(this::toResponse)
@@ -28,7 +28,7 @@ public class VehicleService {
   }
 
   @Transactional
-  public VehicleDtos.VehicleResponse create(Long userId, VehicleDtos.VehicleRequest request) {
+  public VehicleResponse create(Long userId, VehicleRequest request) {
     Vehicle vehicle = new Vehicle();
     apply(vehicle, request);
     vehicle.setUserId(userId);
@@ -38,7 +38,7 @@ public class VehicleService {
   }
 
   @Transactional
-  public VehicleDtos.VehicleResponse update(Long id, Long userId, VehicleDtos.VehicleRequest request) {
+  public VehicleResponse update(Long id, Long userId, VehicleRequest request) {
     Vehicle vehicle = getOwned(id, userId);
     apply(vehicle, request);
     vehicle.setLastModifiedAt(Instant.now());
@@ -61,8 +61,8 @@ public class VehicleService {
     return vehicleRepository.findByUserIdAndLastModifiedAtAfterOrderByLastModifiedAtAsc(userId, lastPulledAt);
   }
 
-  public VehicleDtos.VehicleResponse toResponse(Vehicle vehicle) {
-    return new VehicleDtos.VehicleResponse(
+  public VehicleResponse toResponse(Vehicle vehicle) {
+    return new VehicleResponse(
         vehicle.getId(),
         vehicle.getUserId(),
         vehicle.getBrand(),
@@ -77,7 +77,7 @@ public class VehicleService {
     );
   }
 
-  public void apply(Vehicle vehicle, VehicleDtos.VehicleRequest request) {
+  public void apply(Vehicle vehicle, VehicleRequest request) {
     vehicle.setBrand(request.brand().trim());
     vehicle.setModel(request.model().trim());
     vehicle.setYear(request.year());

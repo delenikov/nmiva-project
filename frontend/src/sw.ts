@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { clientsClaim } from 'workbox-core'
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching'
-import { registerRoute, setCatchHandler } from 'workbox-routing'
+import { registerRoute, setCatchHandler, setDefaultHandler } from 'workbox-routing'
 import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 
 declare let self: ServiceWorkerGlobalScope
@@ -41,14 +41,25 @@ registerRoute(
 )
 
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
-  new NetworkFirst({ cacheName: 'nmiva-api', networkTimeoutSeconds: 5 })
+    ({ request, url }) => request.method === 'GET'
+        && url.pathname.startsWith('/api/'),
+    new NetworkFirst({ cacheName: 'nmiva-api', networkTimeoutSeconds: 5 })
 )
 
 registerRoute(
-  ({ request, url }) => request.method === 'POST' && url.pathname.startsWith('/api/'),
+    ({ request, url }) =>
+        ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+        && url.pathname.startsWith('/api/'),
+    new NetworkOnly()
+)
+
+registerRoute(
+  ({ request, url }) =>
+    request.method === 'GET' && (url.pathname.startsWith('/src/') || url.pathname.startsWith('/node_modules/')),
   new NetworkOnly()
 )
+
+setDefaultHandler(new NetworkOnly())
 
 setCatchHandler(async ({ event }) => {
   const request = (event as FetchEvent).request

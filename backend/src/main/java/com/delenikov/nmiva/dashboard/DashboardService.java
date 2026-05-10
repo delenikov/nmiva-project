@@ -1,11 +1,11 @@
 package com.delenikov.nmiva.dashboard;
 
 import com.delenikov.nmiva.entry.Entry;
-import com.delenikov.nmiva.entry.EntryDtos;
 import com.delenikov.nmiva.entry.EntryRepository;
 import com.delenikov.nmiva.entry.EntryType;
 import com.delenikov.nmiva.entry.FuelConsumptionService;
 import com.delenikov.nmiva.entry.ReminderDueService;
+import com.delenikov.nmiva.entry.ReminderResponse;
 import com.delenikov.nmiva.vehicle.Vehicle;
 import com.delenikov.nmiva.vehicle.VehicleService;
 import java.math.BigDecimal;
@@ -26,7 +26,7 @@ public class DashboardService {
   private final ReminderDueService reminderDueService;
 
   @Transactional(readOnly = true)
-  public DashboardDtos.DashboardResponse getDashboard(Long userId, Long vehicleId) {
+  public DashboardResponse getDashboard(Long userId, Long vehicleId) {
     Vehicle vehicle = vehicleService.getOwned(vehicleId, userId);
     List<Entry> entries = entryRepository.findByUserIdAndVehicleIdAndDeletedFalseOrderByDateDescCreatedAtDesc(userId, vehicleId);
     YearMonth currentMonth = YearMonth.now();
@@ -44,10 +44,10 @@ public class DashboardService {
         .map(Entry::getCost)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    DashboardDtos.OdometerSnapshot odometerSnapshot = entries.stream()
+    OdometerSnapshot odometerSnapshot = entries.stream()
         .filter(e -> e.getOdometer() != null)
         .max(Comparator.comparing(Entry::getDate).thenComparing(Entry::getCreatedAt))
-        .map(entry -> new DashboardDtos.OdometerSnapshot(entry.getDate(), entry.getOdometer()))
+        .map(entry -> new OdometerSnapshot(entry.getDate(), entry.getOdometer()))
         .orElse(null);
 
     List<Entry> fullTankRefuels = entryRepository
@@ -59,12 +59,12 @@ public class DashboardService {
     FuelConsumptionService.FuelMetrics fuelMetrics = fuelConsumptionService.calculate(fullTankRefuels);
 
     LocalDate today = LocalDate.now();
-    List<EntryDtos.ReminderResponse> upcoming = entries.stream()
+    List<ReminderResponse> upcoming = entries.stream()
         .filter(e -> e.getType() == EntryType.REMINDER && !e.isCompleted())
         .map(e -> {
           LocalDate effective = reminderDueService.resolveEffectiveDueDate(e, today);
           boolean overdue = effective != null && effective.isBefore(today);
-          return new EntryDtos.ReminderResponse(
+          return new ReminderResponse(
               e.getId(),
               e.getVehicleId(),
               e.getTitle(),
@@ -78,15 +78,15 @@ public class DashboardService {
         .filter(r -> r.effectiveDueDate() != null
             && !r.effectiveDueDate().isBefore(today)
             && !r.effectiveDueDate().isAfter(today.plusDays(30)))
-        .sorted(Comparator.comparing(EntryDtos.ReminderResponse::effectiveDueDate))
+        .sorted(Comparator.comparing(ReminderResponse::effectiveDueDate))
         .toList();
 
-    List<EntryDtos.ReminderResponse> overdue = entries.stream()
+    List<ReminderResponse> overdue = entries.stream()
         .filter(e -> e.getType() == EntryType.REMINDER && !e.isCompleted())
         .map(e -> {
           LocalDate effective = reminderDueService.resolveEffectiveDueDate(e, today);
           boolean isOverdue = effective != null && effective.isBefore(today);
-          return new EntryDtos.ReminderResponse(
+          return new ReminderResponse(
               e.getId(),
               e.getVehicleId(),
               e.getTitle(),
@@ -97,12 +97,12 @@ public class DashboardService {
               e.isCompleted()
           );
         })
-        .filter(EntryDtos.ReminderResponse::overdue)
-        .sorted(Comparator.comparing(EntryDtos.ReminderResponse::effectiveDueDate))
+        .filter(ReminderResponse::overdue)
+        .sorted(Comparator.comparing(ReminderResponse::effectiveDueDate))
         .toList();
 
-    return new DashboardDtos.DashboardResponse(
-        new DashboardDtos.VehicleSummary(
+    return new DashboardResponse(
+        new VehicleSummary(
             vehicle.getId(),
             vehicle.getBrand(),
             vehicle.getModel(),

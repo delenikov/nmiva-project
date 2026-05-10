@@ -20,10 +20,11 @@ public class AuthService {
   private final JwtService jwtService;
 
   @Transactional
-  public AuthDtos.AuthResponse register(AuthDtos.RegisterRequest request) {
+  public AuthResponse register(RegisterRequest request) {
     if (userRepository.findByEmailIgnoreCase(request.email()).isPresent()) {
       throw new ApiException(HttpStatus.CONFLICT, "Email already registered");
     }
+
     User user = new User();
     user.setEmail(request.email().toLowerCase());
     user.setDisplayName(request.displayName());
@@ -37,10 +38,10 @@ public class AuthService {
     userSettingsRepository.save(settings);
 
     String token = jwtService.generateToken(user.getId(), user.getEmail());
-    return new AuthDtos.AuthResponse(token, toMe(user));
+    return new AuthResponse(token, toMe(user));
   }
 
-  public AuthDtos.AuthResponse login(AuthDtos.LoginRequest request) {
+  public AuthResponse login(LoginRequest request) {
     User user = userRepository.findByEmailIgnoreCase(request.email())
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
@@ -48,16 +49,16 @@ public class AuthService {
       throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
     String token = jwtService.generateToken(user.getId(), user.getEmail());
-    return new AuthDtos.AuthResponse(token, toMe(user));
+    return new AuthResponse(token, toMe(user));
   }
 
-  public AuthDtos.UserMeResponse me(Long userId) {
+  public UserMeResponse me(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
     return toMe(user);
   }
 
-  private AuthDtos.UserMeResponse toMe(User user) {
-    return new AuthDtos.UserMeResponse(user.getId(), user.getEmail(), user.getDisplayName());
+  private UserMeResponse toMe(User user) {
+    return new UserMeResponse(user.getId(), user.getEmail(), user.getDisplayName());
   }
 }

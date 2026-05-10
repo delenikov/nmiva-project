@@ -19,7 +19,7 @@ public class EntryService {
   private final ReminderDueService reminderDueService;
 
   @Transactional(readOnly = true)
-  public List<EntryDtos.EntryResponse> listForVehicle(Long userId, Long vehicleId, String type) {
+  public List<EntryResponse> listForVehicle(Long userId, Long vehicleId, String type) {
     vehicleService.getOwned(vehicleId, userId);
     List<Entry> entries;
     if (type == null || type.isBlank()) {
@@ -35,7 +35,7 @@ public class EntryService {
   }
 
   @Transactional
-  public EntryDtos.EntryResponse create(Long userId, Long vehicleId, EntryDtos.EntryRequest request) {
+  public EntryResponse create(Long userId, Long vehicleId, EntryRequest request) {
     vehicleService.getOwned(vehicleId, userId);
     Entry entry = new Entry();
     entry.setUserId(userId);
@@ -48,7 +48,7 @@ public class EntryService {
   }
 
   @Transactional
-  public EntryDtos.EntryResponse update(Long userId, Long entryId, EntryDtos.EntryRequest request) {
+  public EntryResponse update(Long userId, Long entryId, EntryRequest request) {
     Entry entry = getOwned(entryId, userId);
     apply(entry, request);
     entry.setLastModifiedAt(Instant.now());
@@ -81,7 +81,7 @@ public class EntryService {
   }
 
   @Transactional(readOnly = true)
-  public List<EntryDtos.ReminderResponse> upcomingReminders(Long userId) {
+  public List<ReminderResponse> upcomingReminders(Long userId) {
     LocalDate today = LocalDate.now();
     LocalDate next30 = today.plusDays(30);
     return entryRepository.findByUserIdAndTypeAndDeletedFalseAndCompletedFalse(userId, EntryType.REMINDER).stream()
@@ -89,17 +89,17 @@ public class EntryService {
         .filter(reminder -> reminder.effectiveDueDate() != null
             && !reminder.effectiveDueDate().isBefore(today)
             && !reminder.effectiveDueDate().isAfter(next30))
-        .sorted(Comparator.comparing(EntryDtos.ReminderResponse::effectiveDueDate))
+        .sorted(Comparator.comparing(ReminderResponse::effectiveDueDate))
         .toList();
   }
 
   @Transactional(readOnly = true)
-  public List<EntryDtos.ReminderResponse> overdueReminders(Long userId) {
+  public List<ReminderResponse> overdueReminders(Long userId) {
     LocalDate today = LocalDate.now();
     return entryRepository.findByUserIdAndTypeAndDeletedFalseAndCompletedFalse(userId, EntryType.REMINDER).stream()
         .map(entry -> toReminderResponse(entry, reminderDueService.resolveEffectiveDueDate(entry, today), today))
-        .filter(EntryDtos.ReminderResponse::overdue)
-        .sorted(Comparator.comparing(EntryDtos.ReminderResponse::effectiveDueDate))
+        .filter(ReminderResponse::overdue)
+        .sorted(Comparator.comparing(ReminderResponse::effectiveDueDate))
         .toList();
   }
 
@@ -133,8 +133,8 @@ public class EntryService {
     return entryRepository.save(entry);
   }
 
-  public EntryDtos.EntryResponse toResponse(Entry entry) {
-    return new EntryDtos.EntryResponse(
+  public EntryResponse toResponse(Entry entry) {
+    return new EntryResponse(
         entry.getId(),
         entry.getVehicleId(),
         entry.getUserId(),
@@ -160,7 +160,7 @@ public class EntryService {
     );
   }
 
-  public void apply(Entry entry, EntryDtos.EntryRequest request) {
+  public void apply(Entry entry, EntryRequest request) {
     EntryType type = EntryType.from(request.type());
     entry.setType(type);
     entry.setDate(request.date());
@@ -184,9 +184,9 @@ public class EntryService {
     validateByType(entry);
   }
 
-  private EntryDtos.ReminderResponse toReminderResponse(Entry entry, LocalDate effectiveDueDate, LocalDate today) {
+  private ReminderResponse toReminderResponse(Entry entry, LocalDate effectiveDueDate, LocalDate today) {
     boolean overdue = effectiveDueDate != null && effectiveDueDate.isBefore(today) && !entry.isCompleted();
-    return new EntryDtos.ReminderResponse(
+    return new ReminderResponse(
         entry.getId(),
         entry.getVehicleId(),
         entry.getTitle(),

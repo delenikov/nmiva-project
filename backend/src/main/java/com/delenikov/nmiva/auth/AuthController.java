@@ -16,17 +16,17 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/register")
-  public AuthDtos.AuthResponse register(@Valid @RequestBody AuthDtos.RegisterRequest request) {
+  public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
     return authService.register(request);
   }
 
   @PostMapping("/login")
-  public AuthDtos.AuthResponse login(@Valid @RequestBody AuthDtos.LoginRequest request) {
+  public AuthResponse login(@Valid @RequestBody LoginRequest request) {
     return authService.login(request);
   }
 
   @GetMapping("/me")
-  public AuthDtos.UserMeResponse me(@AuthenticationPrincipal AuthenticatedUser user) {
+  public UserMeResponse me(@AuthenticationPrincipal AuthenticatedUser user) {
     return authService.me(user.id());
   }
 }

@@ -12,9 +12,11 @@ public class BouncyCastleConfig {
   @Bean
   public Provider bouncyCastleProvider() {
     Provider existing = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+
     if (existing != null) {
       return existing;
     }
+
     Provider provider = new BouncyCastleProvider();
     Security.addProvider(provider);
     return provider;

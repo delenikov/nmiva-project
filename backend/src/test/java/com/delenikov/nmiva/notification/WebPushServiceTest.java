@@ -34,7 +34,7 @@ class WebPushServiceTest {
     when(repository.findByUserIdAndEndpoint(1L, "https://example.com/sub"))
         .thenReturn(Optional.of(existing));
 
-    service.subscribe(1L, new PushDtos.PushSubscriptionRequest("https://example.com/sub", "newP256dh", "newAuth"));
+    service.subscribe(1L, new PushSubscriptionRequest("https://example.com/sub", "newP256dh", "newAuth"));
 
     verify(repository).save(existing);
   }
