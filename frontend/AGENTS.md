@@ -181,7 +181,7 @@ This is a specialization of [Defer Await Until Needed](./async-defer-await.md) f
 
 **Incorrect:**
 
-```typescript
+```text
 const someFlag = await getFlag()
 
 if (someFlag && someCondition) {
@@ -191,7 +191,7 @@ if (someFlag && someCondition) {
 
 **Correct:**
 
-```typescript
+```text
 if (someCondition) {
   const someFlag = await getFlag()
   if (someFlag) {
@@ -212,7 +212,7 @@ Move `await` operations into the branches where they're actually used to avoid b
 
 **Incorrect: blocks both branches**
 
-```typescript
+```text
 async function handleRequest(userId: string, skipProcessing: boolean) {
   const userData = await fetchUserData(userId)
   
@@ -228,7 +228,7 @@ async function handleRequest(userId: string, skipProcessing: boolean) {
 
 **Correct: only blocks when needed**
 
-```typescript
+```text
 async function handleRequest(userId: string, skipProcessing: boolean) {
   if (skipProcessing) {
     // Returns immediately without waiting
@@ -243,7 +243,7 @@ async function handleRequest(userId: string, skipProcessing: boolean) {
 
 **Another example: early return optimization**
 
-```typescript
+```text
 // Incorrect: always fetches permissions
 async function updateResource(resourceId: string, userId: string) {
   const permissions = await fetchPermissions(userId)
@@ -290,7 +290,7 @@ For operations with partial dependencies, use `better-all` to maximize paralleli
 
 **Incorrect: profile waits for config unnecessarily**
 
-```typescript
+```text
 const [user, config] = await Promise.all([
   fetchUser(),
   fetchConfig()
@@ -300,7 +300,7 @@ const profile = await fetchProfile(user.id)
 
 **Correct: config and profile run in parallel**
 
-```typescript
+```text
 import { all } from 'better-all'
 
 const { user, config, profile } = await all({
@@ -314,7 +314,7 @@ const { user, config, profile } = await all({
 
 **Alternative without extra dependencies:**
 
-```typescript
+```text
 const userPromise = fetchUser()
 const profilePromise = userPromise.then(user => fetchProfile(user.id))
 
@@ -337,7 +337,7 @@ In API routes and Server Actions, start independent operations immediately, even
 
 **Incorrect: config waits for auth, data waits for both**
 
-```typescript
+```text
 export async function GET(request: Request) {
   const session = await auth()
   const config = await fetchConfig()
@@ -348,7 +348,7 @@ export async function GET(request: Request) {
 
 **Correct: auth and config start immediately**
 
-```typescript
+```text
 export async function GET(request: Request) {
   const sessionPromise = auth()
   const configPromise = fetchConfig()
@@ -371,7 +371,7 @@ When async operations have no interdependencies, execute them concurrently using
 
 **Incorrect: sequential execution, 3 round trips**
 
-```typescript
+```text
 const user = await fetchUser()
 const posts = await fetchPosts()
 const comments = await fetchComments()
@@ -379,7 +379,7 @@ const comments = await fetchComments()
 
 **Correct: parallel execution, 1 round trip**
 
-```typescript
+```text
 const [user, posts, comments] = await Promise.all([
   fetchUser(),
   fetchPosts(),
@@ -395,7 +395,7 @@ Instead of awaiting data in async components before returning JSX, use Suspense 
 
 **Incorrect: wrapper blocked by data fetching**
 
-```tsx
+```text
 async function Page() {
   const data = await fetchData() // Blocks entire page
   
@@ -416,7 +416,7 @@ The entire layout waits for data even though only the middle section needs it.
 
 **Correct: wrapper shows immediately, data streams in**
 
-```tsx
+```text
 function Page() {
   return (
     <div>
@@ -442,7 +442,7 @@ Sidebar, Header, and Footer render immediately. Only DataDisplay waits for data.
 
 **Alternative: share promise across components**
 
-```tsx
+```text
 function Page() {
   // Start fetch immediately, but don't await
   const dataPromise = fetchData()
@@ -505,7 +505,7 @@ Popular icon and component libraries can have **up to 10,000 re-exports** in the
 
 **Incorrect: imports entire library**
 
-```tsx
+```text
 import { Check, X, Menu } from 'lucide-react'
 // Loads 1,583 modules, takes ~2.8s extra in dev
 // Runtime cost: 200-800ms on every cold start
@@ -516,7 +516,7 @@ import { Button, TextField } from '@mui/material'
 
 **Correct - Next.js 13.5+ (recommended):**
 
-```tsx
+```text
 // Keep the standard imports - Next.js transforms them to direct imports
 import { Check, X, Menu } from 'lucide-react'
 // Full TypeScript support, no manual path wrangling
@@ -526,7 +526,7 @@ This is the recommended approach because it preserves TypeScript type safety and
 
 **Correct - Direct imports (non-Next.js projects):**
 
-```tsx
+```text
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 // Loads only what you use
@@ -548,7 +548,7 @@ Load large data or modules only when a feature is activated.
 
 **Example: lazy-load animation frames**
 
-```tsx
+```text
 function AnimationPlayer({ enabled, setEnabled }: { enabled: boolean; setEnabled: React.Dispatch<React.SetStateAction<boolean>> }) {
   const [frames, setFrames] = useState<Frame[] | null>(null)
 
@@ -575,7 +575,7 @@ Analytics, logging, and error tracking don't block user interaction. Load them a
 
 **Incorrect: blocks initial bundle**
 
-```tsx
+```text
 import { Analytics } from '@vercel/analytics/react'
 
 export default function RootLayout({ children }) {
@@ -592,7 +592,7 @@ export default function RootLayout({ children }) {
 
 **Correct: loads after hydration**
 
-```tsx
+```text
 import dynamic from 'next/dynamic'
 
 const Analytics = dynamic(
@@ -620,7 +620,7 @@ Use `next/dynamic` to lazy-load large components not needed on initial render.
 
 **Incorrect: Monaco bundles with main chunk ~300KB**
 
-```tsx
+```text
 import { MonacoEditor } from './monaco-editor'
 
 function CodePanel({ code }: { code: string }) {
@@ -630,7 +630,7 @@ function CodePanel({ code }: { code: string }) {
 
 **Correct: Monaco loads on demand**
 
-```tsx
+```text
 import dynamic from 'next/dynamic'
 
 const MonacoEditor = dynamic(
@@ -663,7 +663,7 @@ When analysis becomes too broad, the cost is real:
 
 **Incorrect: the bundler cannot tell what may be imported**
 
-```ts
+```text
 const PAGE_MODULES = {
   home: './pages/home',
   settings: './pages/settings',
@@ -674,7 +674,7 @@ const Page = await import(PAGE_MODULES[pageName])
 
 **Correct: use an explicit map of allowed modules**
 
-```ts
+```text
 const PAGE_MODULES = {
   home: () => import('./pages/home'),
   settings: () => import('./pages/settings'),
@@ -685,13 +685,13 @@ const Page = await PAGE_MODULES[pageName]()
 
 **Incorrect: a 2-value enum still hides the final path from static analysis**
 
-```ts
+```text
 const baseDir = path.join(process.cwd(), 'content/' + contentKind)
 ```
 
 **Correct: make each final path literal at the callsite**
 
-```ts
+```text
 const baseDir =
   kind === ContentKind.Blog
     ? path.join(process.cwd(), 'content/blog')
@@ -710,7 +710,7 @@ Preload heavy bundles before they're needed to reduce perceived latency.
 
 **Example: preload on hover/focus**
 
-```tsx
+```text
 function EditorButton({ onClick }: { onClick: () => void }) {
   const preload = () => {
     if (typeof window !== 'undefined') {
@@ -732,7 +732,7 @@ function EditorButton({ onClick }: { onClick: () => void }) {
 
 **Example: preload when feature flag is enabled**
 
-```tsx
+```text
 function FlagsProvider({ children, flags }: Props) {
   useEffect(() => {
     if (flags.editorEnabled && typeof window !== 'undefined') {
@@ -766,7 +766,7 @@ Next.js documentation explicitly states: "Treat Server Actions with the same sec
 
 **Incorrect: no authentication check**
 
-```typescript
+```text
 'use server'
 
 export async function deleteUser(userId: string) {
@@ -778,7 +778,7 @@ export async function deleteUser(userId: string) {
 
 **Correct: authentication inside the action**
 
-```typescript
+```text
 'use server'
 
 import { verifySession } from '@/lib/auth'
@@ -804,7 +804,7 @@ export async function deleteUser(userId: string) {
 
 **With input validation:**
 
-```typescript
+```text
 'use server'
 
 import { verifySession } from '@/lib/auth'
@@ -854,14 +854,14 @@ RSC→client serialization deduplicates by object reference, not value. Same ref
 
 **Incorrect: duplicates array**
 
-```tsx
+```text
 // RSC: sends 6 strings (2 arrays × 3 items)
 <ClientList usernames={usernames} usernamesOrdered={usernames.toSorted()} />
 ```
 
 **Correct: sends 3 strings**
 
-```tsx
+```text
 // RSC: send once
 <ClientList usernames={usernames} />
 
@@ -872,7 +872,7 @@ const sorted = useMemo(() => [...usernames].sort(), [usernames])
 
 **Nested deduplication behavior:**
 
-```tsx
+```text
 // string[] - duplicates everything
 usernames={['a','b']} sorted={usernames.toSorted()} // sends 4 strings
 
@@ -894,7 +894,7 @@ Deduplication works recursively. Impact varies by data type:
 
 **More examples:**
 
-```tsx
+```text
 // ❌ Bad
 <C users={users} active={users.filter(u => u.active)} />
 <C product={product} productName={product.name} />
@@ -917,7 +917,7 @@ Treat module scope on the server as process-wide shared memory, not request-loca
 
 **Incorrect: request data leaks across concurrent renders**
 
-```tsx
+```text
 let currentUser: User | null = null
 
 export default async function Page() {
@@ -934,7 +934,7 @@ If two requests overlap, request A can set `currentUser`, then request B overwri
 
 **Correct: keep request data local to the render tree**
 
-```tsx
+```text
 export default async function Page() {
   const user = await auth()
   return <Dashboard user={user} />
@@ -963,7 +963,7 @@ For static assets and config, see [Hoist Static I/O to Module Level](./server-ho
 
 **Implementation:**
 
-```typescript
+```text
 import { LRUCache } from 'lru-cache'
 
 const cache = new LRUCache<string, any>({
@@ -1000,7 +1000,7 @@ When loading static assets (fonts, logos, images, config files) in route handler
 
 **Incorrect: reads font file on every request**
 
-```typescript
+```text
 // app/api/og/route.tsx
 import { ImageResponse } from 'next/og'
 
@@ -1026,7 +1026,7 @@ export async function GET(request: Request) {
 
 **Correct: loads once at module initialization**
 
-```typescript
+```text
 // app/api/og/route.tsx
 import { ImageResponse } from 'next/og'
 
@@ -1055,7 +1055,7 @@ export async function GET(request: Request) {
 
 **Correct: synchronous fs at module level**
 
-```typescript
+```text
 // app/api/og/route.tsx
 import { ImageResponse } from 'next/og'
 import { readFileSync } from 'fs'
@@ -1083,7 +1083,7 @@ export async function GET(request: Request) {
 
 **Incorrect: reads config on every call**
 
-```typescript
+```text
 import fs from 'node:fs/promises'
 
 export async function processRequest(data: Data) {
@@ -1098,7 +1098,7 @@ export async function processRequest(data: Data) {
 
 **Correct: hoists config and template to module level**
 
-```typescript
+```text
 import fs from 'node:fs/promises'
 
 const configPromise = fs
@@ -1150,7 +1150,7 @@ The React Server/Client boundary serializes all object properties into strings a
 
 **Incorrect: serializes all 50 fields**
 
-```tsx
+```text
 async function Page() {
   const user = await fetchUser()  // 50 fields
   return <Profile user={user} />
@@ -1164,7 +1164,7 @@ function Profile({ user }: { user: User }) {
 
 **Correct: serializes only 1 field**
 
-```tsx
+```text
 async function Page() {
   const user = await fetchUser()
   return <Profile name={user.name} />
@@ -1184,7 +1184,7 @@ React Server Components execute sequentially within a tree. Restructure with com
 
 **Incorrect: Sidebar waits for Page's fetch to complete**
 
-```tsx
+```text
 export default async function Page() {
   const header = await fetchHeader()
   return (
@@ -1203,7 +1203,7 @@ async function Sidebar() {
 
 **Correct: both fetch simultaneously**
 
-```tsx
+```text
 async function Header() {
   const data = await fetchHeader()
   return <div>{data}</div>
@@ -1226,7 +1226,7 @@ export default function Page() {
 
 **Alternative with children prop:**
 
-```tsx
+```text
 async function Header() {
   const data = await fetchHeader()
   return <div>{data}</div>
@@ -1263,7 +1263,7 @@ When fetching nested data in parallel, chain dependent fetches within each item'
 
 **Incorrect: a single slow item blocks all nested fetches**
 
-```tsx
+```text
 const chats = await Promise.all(
   chatIds.map(id => getChat(id))
 )
@@ -1277,7 +1277,7 @@ If one `getChat(id)` out of 100 is extremely slow, the authors of the other 99 c
 
 **Correct: each item chains its own nested fetch**
 
-```tsx
+```text
 const chatAuthors = await Promise.all(
   chatIds.map(id => getChat(id).then(chat => getUser(chat.author)))
 )
@@ -1293,7 +1293,7 @@ Use `React.cache()` for server-side request deduplication. Authentication and da
 
 **Usage:**
 
-```typescript
+```text
 import { cache } from 'react'
 
 export const getCurrentUser = cache(async () => {
@@ -1313,7 +1313,7 @@ Within a single request, multiple calls to `getCurrentUser()` execute the query 
 
 **Incorrect: always cache miss**
 
-```typescript
+```text
 const getUser = cache(async (params: { uid: number }) => {
   return await db.user.findUnique({ where: { id: params.uid } })
 })
@@ -1325,7 +1325,7 @@ getUser({ uid: 1 })  // Cache miss, runs query again
 
 **Correct: cache hit**
 
-```typescript
+```text
 const params = { uid: 1 }
 getUser(params)  // Query runs
 getUser(params)  // Cache hit (same reference)
@@ -1359,7 +1359,7 @@ Use Next.js's `after()` to schedule work that should execute after a response is
 
 **Incorrect: blocks response**
 
-```tsx
+```text
 import { logUserAction } from '@/app/utils'
 
 export async function POST(request: Request) {
@@ -1379,7 +1379,7 @@ export async function POST(request: Request) {
 
 **Correct: non-blocking**
 
-```tsx
+```text
 import { after } from 'next/server'
 import { headers, cookies } from 'next/headers'
 import { logUserAction } from '@/app/utils'
@@ -1441,7 +1441,7 @@ Use `useSWRSubscription()` to share global event listeners across component inst
 
 **Incorrect: N instances = N listeners**
 
-```tsx
+```text
 function useKeyboardShortcut(key: string, callback: () => void) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -1459,7 +1459,7 @@ When using the `useKeyboardShortcut` hook multiple times, each instance will reg
 
 **Correct: N instances = 1 listener**
 
-```tsx
+```text
 import useSWRSubscription from 'swr/subscription'
 
 // Module-level Map to track callbacks per key
@@ -1511,7 +1511,7 @@ Add `{ passive: true }` to touch and wheel event listeners to enable immediate s
 
 **Incorrect:**
 
-```typescript
+```text
 useEffect(() => {
   const handleTouch = (e: TouchEvent) => console.log(e.touches[0].clientX)
   const handleWheel = (e: WheelEvent) => console.log(e.deltaY)
@@ -1528,7 +1528,7 @@ useEffect(() => {
 
 **Correct:**
 
-```typescript
+```text
 useEffect(() => {
   const handleTouch = (e: TouchEvent) => console.log(e.touches[0].clientX)
   const handleWheel = (e: WheelEvent) => console.log(e.deltaY)
@@ -1555,7 +1555,7 @@ SWR enables request deduplication, caching, and revalidation across component in
 
 **Incorrect: no deduplication, each instance fetches**
 
-```tsx
+```text
 function UserList() {
   const [users, setUsers] = useState([])
   useEffect(() => {
@@ -1568,7 +1568,7 @@ function UserList() {
 
 **Correct: multiple instances share one request**
 
-```tsx
+```text
 import useSWR from 'swr'
 
 function UserList() {
@@ -1578,7 +1578,7 @@ function UserList() {
 
 **For immutable data:**
 
-```tsx
+```text
 import { useImmutableSWR } from '@/lib/swr'
 
 function StaticContent() {
@@ -1588,7 +1588,7 @@ function StaticContent() {
 
 **For mutations:**
 
-```tsx
+```text
 import { useSWRMutation } from 'swr/mutation'
 
 function UpdateButton() {
@@ -1607,7 +1607,7 @@ Add version prefix to keys and store only needed fields. Prevents schema conflic
 
 **Incorrect:**
 
-```typescript
+```text
 // No version, stores everything, no error handling
 localStorage.setItem('userConfig', JSON.stringify(fullUserObject))
 const data = localStorage.getItem('userConfig')
@@ -1615,7 +1615,7 @@ const data = localStorage.getItem('userConfig')
 
 **Correct:**
 
-```typescript
+```text
 const VERSION = 'v2'
 
 function saveConfig(config: { theme: string; language: string }) {
@@ -1650,7 +1650,7 @@ function migrate() {
 
 **Store minimal fields from server responses:**
 
-```typescript
+```text
 // User object has 20+ fields, only store what UI needs
 function cachePrefs(user: FullUser) {
   try {
@@ -1682,7 +1682,7 @@ If a value can be computed from current props/state, do not store it in state or
 
 **Incorrect: redundant state and effect**
 
-```tsx
+```text
 function Form() {
   const [firstName, setFirstName] = useState('First')
   const [lastName, setLastName] = useState('Last')
@@ -1698,7 +1698,7 @@ function Form() {
 
 **Correct: derive during render**
 
-```tsx
+```text
 function Form() {
   const [firstName, setFirstName] = useState('First')
   const [lastName, setLastName] = useState('Last')
@@ -1718,7 +1718,7 @@ Don't subscribe to dynamic state (searchParams, localStorage) if you only read i
 
 **Incorrect: subscribes to all searchParams changes**
 
-```tsx
+```text
 function ShareButton({ chatId }: { chatId: string }) {
   const searchParams = useSearchParams()
 
@@ -1733,7 +1733,7 @@ function ShareButton({ chatId }: { chatId: string }) {
 
 **Correct: reads on demand, no subscription**
 
-```tsx
+```text
 function ShareButton({ chatId }: { chatId: string }) {
   const handleShare = () => {
     const params = new URLSearchParams(window.location.search)
@@ -1755,7 +1755,7 @@ Calling `useMemo` and comparing hook dependencies may consume more resources tha
 
 **Incorrect:**
 
-```tsx
+```text
 function Header({ user, notifications }: Props) {
   const isLoading = useMemo(() => {
     return user.isLoading || notifications.isLoading
@@ -1768,7 +1768,7 @@ function Header({ user, notifications }: Props) {
 
 **Correct:**
 
-```tsx
+```text
 function Header({ user, notifications }: Props) {
   const isLoading = user.isLoading || notifications.isLoading
 
@@ -1787,7 +1787,7 @@ A common reason developers do this is to access parent variables without passing
 
 **Incorrect: remounts on every render**
 
-```tsx
+```text
 function UserProfile({ user, theme }) {
   // Defined inside to access `theme` - BAD
   const Avatar = () => (
@@ -1818,7 +1818,7 @@ Every time `UserProfile` renders, `Avatar` and `Stats` are new component types. 
 
 **Correct: pass props instead**
 
-```tsx
+```text
 function Avatar({ src, theme }: { src: string; theme: string }) {
   return (
     <img
@@ -1867,7 +1867,7 @@ To address this issue, extract the default value into a constant.
 
 **Incorrect: `onClick` has different values on every rerender**
 
-```tsx
+```text
 const UserAvatar = memo(function UserAvatar({ onClick = () => {} }: { onClick?: () => void }) {
   // ...
 })
@@ -1878,7 +1878,7 @@ const UserAvatar = memo(function UserAvatar({ onClick = () => {} }: { onClick?: 
 
 **Correct: stable default value**
 
-```tsx
+```text
 const NOOP = () => {};
 
 const UserAvatar = memo(function UserAvatar({ onClick = NOOP }: { onClick?: () => void }) {
@@ -1897,7 +1897,7 @@ Extract expensive work into memoized components to enable early returns before c
 
 **Incorrect: computes avatar even when loading**
 
-```tsx
+```text
 function Profile({ user, loading }: Props) {
   const avatar = useMemo(() => {
     const id = computeAvatarId(user)
@@ -1911,7 +1911,7 @@ function Profile({ user, loading }: Props) {
 
 **Correct: skips computation when loading**
 
-```tsx
+```text
 const UserAvatar = memo(function UserAvatar({ user }: { user: User }) {
   const id = useMemo(() => computeAvatarId(user), [user])
   return <Avatar id={id} />
@@ -1937,7 +1937,7 @@ Specify primitive dependencies instead of objects to minimize effect re-runs.
 
 **Incorrect: re-runs on any user field change**
 
-```tsx
+```text
 useEffect(() => {
   console.log(user.id)
 }, [user])
@@ -1945,7 +1945,7 @@ useEffect(() => {
 
 **Correct: re-runs only when id changes**
 
-```tsx
+```text
 useEffect(() => {
   console.log(user.id)
 }, [user.id])
@@ -1953,7 +1953,7 @@ useEffect(() => {
 
 **For derived state, compute outside effect:**
 
-```tsx
+```text
 // Incorrect: runs on width=767, 766, 765...
 useEffect(() => {
   if (width < 768) {
@@ -1978,7 +1978,7 @@ If a side effect is triggered by a specific user action (submit, click, drag), r
 
 **Incorrect: event modeled as state + effect**
 
-```tsx
+```text
 function Form() {
   const [submitted, setSubmitted] = useState(false)
   const theme = useContext(ThemeContext)
@@ -1996,7 +1996,7 @@ function Form() {
 
 **Correct: do it in the handler**
 
-```tsx
+```text
 function Form() {
   const theme = useContext(ThemeContext)
 
@@ -2019,7 +2019,7 @@ When a hook contains multiple independent tasks with different dependencies, spl
 
 **Incorrect: changing `sortOrder` recomputes filtering**
 
-```tsx
+```text
 const sortedProducts = useMemo(() => {
   const filtered = products.filter((p) => p.category === category)
   const sorted = filtered.toSorted((a, b) =>
@@ -2031,7 +2031,7 @@ const sortedProducts = useMemo(() => {
 
 **Correct: filtering only recomputes when products or category change**
 
-```tsx
+```text
 const filteredProducts = useMemo(
   () => products.filter((p) => p.category === category),
   [products, category]
@@ -2050,7 +2050,7 @@ This pattern also applies to `useEffect` when combining unrelated side effects:
 
 **Incorrect: both effects run when either dependency changes**
 
-```tsx
+```text
 useEffect(() => {
   analytics.trackPageView(pathname)
   document.title = `${pageTitle} | My App`
@@ -2059,7 +2059,7 @@ useEffect(() => {
 
 **Correct: effects run independently**
 
-```tsx
+```text
 useEffect(() => {
   analytics.trackPageView(pathname)
 }, [pathname])
@@ -2079,7 +2079,7 @@ Subscribe to derived boolean state instead of continuous values to reduce re-ren
 
 **Incorrect: re-renders on every pixel change**
 
-```tsx
+```text
 function Sidebar() {
   const width = useWindowWidth()  // updates continuously
   const isMobile = width < 768
@@ -2089,7 +2089,7 @@ function Sidebar() {
 
 **Correct: re-renders only when boolean changes**
 
-```tsx
+```text
 function Sidebar() {
   const isMobile = useMediaQuery('(max-width: 767px)')
   return <nav className={isMobile ? 'mobile' : 'desktop'} />
@@ -2104,7 +2104,7 @@ When updating state based on the current state value, use the functional update 
 
 **Incorrect: requires state as dependency**
 
-```tsx
+```text
 function TodoList() {
   const [items, setItems] = useState(initialItems)
   
@@ -2126,7 +2126,7 @@ The first callback is recreated every time `items` changes, which can cause chil
 
 **Correct: stable callbacks, no stale closures**
 
-```tsx
+```text
 function TodoList() {
   const [items, setItems] = useState(initialItems)
   
@@ -2182,7 +2182,7 @@ Pass a function to `useState` for expensive initial values. Without the function
 
 **Incorrect: runs on every render**
 
-```tsx
+```text
 function FilteredList({ items }: { items: Item[] }) {
   // buildSearchIndex() runs on EVERY render, even after initialization
   const [searchIndex, setSearchIndex] = useState(buildSearchIndex(items))
@@ -2204,7 +2204,7 @@ function UserProfile() {
 
 **Correct: runs only once**
 
-```tsx
+```text
 function FilteredList({ items }: { items: Item[] }) {
   // buildSearchIndex() runs ONLY on initial render
   const [searchIndex, setSearchIndex] = useState(() => buildSearchIndex(items))
@@ -2236,7 +2236,7 @@ Mark frequent, non-urgent state updates as transitions to maintain UI responsive
 
 **Incorrect: blocks UI on every scroll**
 
-```tsx
+```text
 function ScrollTracker() {
   const [scrollY, setScrollY] = useState(0)
   useEffect(() => {
@@ -2249,7 +2249,7 @@ function ScrollTracker() {
 
 **Correct: non-blocking updates**
 
-```tsx
+```text
 import { startTransition } from 'react'
 
 function ScrollTracker() {
@@ -2272,7 +2272,7 @@ When user input triggers expensive computations or renders, use `useDeferredValu
 
 **Incorrect: input feels laggy while filtering**
 
-```tsx
+```text
 function Search({ items }: { items: Item[] }) {
   const [query, setQuery] = useState('')
   const filtered = items.filter(item => fuzzyMatch(item, query))
@@ -2288,7 +2288,7 @@ function Search({ items }: { items: Item[] }) {
 
 **Correct: input stays snappy, results render when ready**
 
-```tsx
+```text
 function Search({ items }: { items: Item[] }) {
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
@@ -2329,7 +2329,7 @@ When a value changes frequently and you don't want a re-render on every update (
 
 **Incorrect: renders every update**
 
-```tsx
+```text
 function Tracker() {
   const [lastX, setLastX] = useState(0)
 
@@ -2356,7 +2356,7 @@ function Tracker() {
 
 **Correct: no re-render for tracking**
 
-```tsx
+```text
 function Tracker() {
   const lastXRef = useRef(0)
   const dotRef = useRef<HTMLDivElement>(null)
@@ -2406,7 +2406,7 @@ Many browsers don't have hardware acceleration for CSS3 animations on SVG elemen
 
 **Incorrect: animating SVG directly - no hardware acceleration**
 
-```tsx
+```text
 function LoadingSpinner() {
   return (
     <svg 
@@ -2423,7 +2423,7 @@ function LoadingSpinner() {
 
 **Correct: animating wrapper div - hardware accelerated**
 
-```tsx
+```text
 function LoadingSpinner() {
   return (
     <div className="animate-spin">
@@ -2458,7 +2458,7 @@ Apply `content-visibility: auto` to defer off-screen rendering.
 
 **Example:**
 
-```tsx
+```text
 function MessageList({ messages }: { messages: Message[] }) {
   return (
     <div className="overflow-y-auto h-screen">
@@ -2483,7 +2483,7 @@ Extract static JSX outside components to avoid re-creation.
 
 **Incorrect: recreates element every render**
 
-```tsx
+```text
 function LoadingSkeleton() {
   return <div className="animate-pulse h-20 bg-gray-200" />
 }
@@ -2499,7 +2499,7 @@ function Container() {
 
 **Correct: reuses same element**
 
-```tsx
+```text
 const loadingSkeleton = (
   <div className="animate-pulse h-20 bg-gray-200" />
 )
@@ -2549,7 +2549,7 @@ When rendering content that depends on client-side storage (localStorage, cookie
 
 **Incorrect: breaks SSR**
 
-```tsx
+```text
 function ThemeWrapper({ children }: { children: ReactNode }) {
   // localStorage is not available on server - throws error
   const theme = localStorage.getItem('theme') || 'light'
@@ -2566,7 +2566,7 @@ Server-side rendering will fail because `localStorage` is undefined.
 
 **Incorrect: visual flickering**
 
-```tsx
+```text
 function ThemeWrapper({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState('light')
   
@@ -2590,7 +2590,7 @@ Component first renders with default value (`light`), then updates after hydrati
 
 **Correct: no flicker, no hydration mismatch**
 
-```tsx
+```text
 function ThemeWrapper({ children }: { children: ReactNode }) {
   return (
     <>
@@ -2627,7 +2627,7 @@ In SSR frameworks (e.g., Next.js), some values are intentionally different on se
 
 **Incorrect: known mismatch warnings**
 
-```tsx
+```text
 function Timestamp() {
   return <span>{new Date().toLocaleString()}</span>
 }
@@ -2635,7 +2635,7 @@ function Timestamp() {
 
 **Correct: suppress expected mismatch only**
 
-```tsx
+```text
 function Timestamp() {
   return (
     <span suppressHydrationWarning>
@@ -2653,7 +2653,7 @@ Use React's `<Activity>` to preserve state/DOM for expensive components that fre
 
 **Usage:**
 
-```tsx
+```text
 import { Activity } from 'react'
 
 function Dropdown({ isOpen }: Props) {
@@ -2681,7 +2681,7 @@ Use `defer` for scripts that depend on DOM or other scripts. Use `async` for ind
 
 **Incorrect: blocks rendering**
 
-```tsx
+```text
 export default function Document() {
   return (
     <html>
@@ -2697,7 +2697,7 @@ export default function Document() {
 
 **Correct: non-blocking**
 
-```tsx
+```text
 import Script from 'next/script'
 
 export default function Page() {
@@ -2722,7 +2722,7 @@ Use explicit ternary operators (`? :`) instead of `&&` for conditional rendering
 
 **Incorrect: renders "0" when count is 0**
 
-```tsx
+```text
 function Badge({ count }: { count: number }) {
   return (
     <div>
@@ -2737,7 +2737,7 @@ function Badge({ count }: { count: number }) {
 
 **Correct: renders nothing when count is 0**
 
-```tsx
+```text
 function Badge({ count }: { count: number }) {
   return (
     <div>
@@ -2770,7 +2770,7 @@ React DOM provides APIs to hint the browser about resources it will need. These 
 
 **Example: preconnect to third-party APIs**
 
-```tsx
+```text
 import { preconnect, prefetchDNS } from 'react-dom'
 
 export default function App() {
@@ -2783,7 +2783,7 @@ export default function App() {
 
 **Example: preload critical fonts and styles**
 
-```tsx
+```text
 import { preload, preinit } from 'react-dom'
 
 export default function RootLayout({ children }) {
@@ -2803,7 +2803,7 @@ export default function RootLayout({ children }) {
 
 **Example: preload modules for code-split routes**
 
-```tsx
+```text
 import { preloadModule, preinitModule } from 'react-dom'
 
 function Navigation() {
@@ -2849,7 +2849,7 @@ Use `useTransition` instead of manual `useState` for loading states. This provid
 
 **Incorrect: manual loading state**
 
-```tsx
+```text
 function SearchResults() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
@@ -2875,7 +2875,7 @@ function SearchResults() {
 
 **Correct: useTransition with built-in pending state**
 
-```tsx
+```text
 import { useTransition, useState } from 'react'
 
 function SearchResults() {
@@ -2931,7 +2931,7 @@ Avoid interleaving style writes with layout reads. When you read a layout proper
 
 **This is OK: browser batches style changes**
 
-```typescript
+```text
 function updateElementStyles(element: HTMLElement) {
   // Each line invalidates style, but browser batches the recalculation
   element.style.width = '100px'
@@ -2943,7 +2943,7 @@ function updateElementStyles(element: HTMLElement) {
 
 **Incorrect: interleaved reads and writes force reflows**
 
-```typescript
+```text
 function layoutThrashing(element: HTMLElement) {
   element.style.width = '100px'
   const width = element.offsetWidth  // Forces reflow
@@ -2954,7 +2954,7 @@ function layoutThrashing(element: HTMLElement) {
 
 **Correct: batch writes, then read once**
 
-```typescript
+```text
 function updateElementStyles(element: HTMLElement) {
   // Batch all writes together
   element.style.width = '100px'
@@ -2969,7 +2969,7 @@ function updateElementStyles(element: HTMLElement) {
 
 **Correct: batch reads, then writes**
 
-```typescript
+```text
 function updateElementStyles(element: HTMLElement) {
   element.classList.add('highlighted-box')
   
@@ -2981,7 +2981,7 @@ function updateElementStyles(element: HTMLElement) {
 
 **React example:**
 
-```tsx
+```text
 // Incorrect: interleaving style changes with layout queries
 function Box({ isHighlighted }: { isHighlighted: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -3019,7 +3019,7 @@ Multiple `.find()` calls by the same key should use a Map.
 
 **Incorrect (O(n) per lookup):**
 
-```typescript
+```text
 function processOrders(orders: Order[], users: User[]) {
   return orders.map(order => ({
     ...order,
@@ -3030,7 +3030,7 @@ function processOrders(orders: Order[], users: User[]) {
 
 **Correct (O(1) per lookup):**
 
-```typescript
+```text
 function processOrders(orders: Order[], users: User[]) {
   const userById = new Map(users.map(u => [u.id, u]))
 
@@ -3053,7 +3053,7 @@ Cache object property lookups in hot paths.
 
 **Incorrect: 3 lookups × N iterations**
 
-```typescript
+```text
 for (let i = 0; i < arr.length; i++) {
   process(obj.config.settings.value)
 }
@@ -3061,7 +3061,7 @@ for (let i = 0; i < arr.length; i++) {
 
 **Correct: 1 lookup total**
 
-```typescript
+```text
 const value = obj.config.settings.value
 const len = arr.length
 for (let i = 0; i < len; i++) {
@@ -3077,7 +3077,7 @@ Use a module-level Map to cache function results when the same function is calle
 
 **Incorrect: redundant computation**
 
-```typescript
+```text
 function ProjectList({ projects }: { projects: Project[] }) {
   return (
     <div>
@@ -3094,7 +3094,7 @@ function ProjectList({ projects }: { projects: Project[] }) {
 
 **Correct: cached results**
 
-```typescript
+```text
 // Module-level cache
 const slugifyCache = new Map<string, string>()
 
@@ -3123,7 +3123,7 @@ function ProjectList({ projects }: { projects: Project[] }) {
 
 **Simpler pattern for single-value functions:**
 
-```typescript
+```text
 let isLoggedInCache: boolean | null = null
 
 function isLoggedIn(): boolean {
@@ -3153,7 +3153,7 @@ Reference: [https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fa
 
 **Incorrect: reads storage on every call**
 
-```typescript
+```text
 function getTheme() {
   return localStorage.getItem('theme') ?? 'light'
 }
@@ -3162,7 +3162,7 @@ function getTheme() {
 
 **Correct: Map cache**
 
-```typescript
+```text
 const storageCache = new Map<string, string | null>()
 
 function getLocalStorage(key: string) {
@@ -3182,7 +3182,7 @@ Use a Map (not a hook) so it works everywhere: utilities, event handlers, not ju
 
 **Cookie caching:**
 
-```typescript
+```text
 let cookieCache: Record<string, string> | null = null
 
 function getCookie(name: string) {
@@ -3197,7 +3197,7 @@ function getCookie(name: string) {
 
 **Important: invalidate on external changes**
 
-```typescript
+```text
 window.addEventListener('storage', (e) => {
   if (e.key) storageCache.delete(e.key)
 })
@@ -3219,7 +3219,7 @@ Multiple `.filter()` or `.map()` calls iterate the array multiple times. Combine
 
 **Incorrect: 3 iterations**
 
-```typescript
+```text
 const admins = users.filter(u => u.isAdmin)
 const testers = users.filter(u => u.isTester)
 const inactive = users.filter(u => !u.isActive)
@@ -3227,7 +3227,7 @@ const inactive = users.filter(u => !u.isActive)
 
 **Correct: 1 iteration**
 
-```typescript
+```text
 const admins: User[] = []
 const testers: User[] = []
 const inactive: User[] = []
@@ -3247,7 +3247,7 @@ Use `requestIdleCallback()` to schedule non-critical work during browser idle pe
 
 **Incorrect: blocks main thread during user interaction**
 
-```typescript
+```text
 function handleSearch(query: string) {
   const results = searchItems(query)
   setResults(results)
@@ -3261,7 +3261,7 @@ function handleSearch(query: string) {
 
 **Correct: defers non-critical work to idle time**
 
-```typescript
+```text
 function handleSearch(query: string) {
   const results = searchItems(query)
   setResults(results)
@@ -3283,7 +3283,7 @@ function handleSearch(query: string) {
 
 **With timeout for required work:**
 
-```typescript
+```text
 // Ensure analytics fires within 2 seconds even if browser stays busy
 requestIdleCallback(
   () => analytics.track('page_view', { path: location.pathname }),
@@ -3293,7 +3293,7 @@ requestIdleCallback(
 
 **Chunking large tasks:**
 
-```typescript
+```text
 function processLargeDataset(items: Item[]) {
   let index = 0
 
@@ -3316,7 +3316,7 @@ function processLargeDataset(items: Item[]) {
 
 **With fallback for unsupported browsers:**
 
-```typescript
+```text
 const scheduleIdleWork = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1))
 
 scheduleIdleWork(() => {
@@ -3354,7 +3354,7 @@ In real-world applications, this optimization is especially valuable when the co
 
 **Incorrect: always runs expensive comparison**
 
-```typescript
+```text
 function hasChanges(current: string[], original: string[]) {
   // Always sorts and joins, even when lengths differ
   return current.sort().join() !== original.sort().join()
@@ -3365,7 +3365,7 @@ Two O(n log n) sorts run even when `current.length` is 5 and `original.length` i
 
 **Correct (O(1) length check first):**
 
-```typescript
+```text
 function hasChanges(current: string[], original: string[]) {
   // Early return if lengths differ
   if (current.length !== original.length) {
@@ -3401,7 +3401,7 @@ Return early when result is determined to skip unnecessary processing.
 
 **Incorrect: processes all items even after finding answer**
 
-```typescript
+```text
 function validateUsers(users: User[]) {
   let hasError = false
   let errorMessage = ''
@@ -3424,7 +3424,7 @@ function validateUsers(users: User[]) {
 
 **Correct: returns immediately on first error**
 
-```typescript
+```text
 function validateUsers(users: User[]) {
   for (const user of users) {
     if (!user.email) {
@@ -3447,7 +3447,7 @@ Don't create RegExp inside render. Hoist to module scope or memoize with `useMem
 
 **Incorrect: new RegExp every render**
 
-```tsx
+```text
 function Highlighter({ text, query }: Props) {
   const regex = new RegExp(`(${query})`, 'gi')
   const parts = text.split(regex)
@@ -3457,7 +3457,7 @@ function Highlighter({ text, query }: Props) {
 
 **Correct: memoize or hoist**
 
-```tsx
+```text
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function Highlighter({ text, query }: Props) {
@@ -3472,7 +3472,7 @@ function Highlighter({ text, query }: Props) {
 
 **Warning: global regex has mutable state**
 
-```typescript
+```text
 const regex = /foo/g
 regex.test('foo')  // true, lastIndex = 3
 regex.test('foo')  // false, lastIndex = 0
@@ -3488,7 +3488,7 @@ Chaining `.map().filter(Boolean)` creates an intermediate array and iterates twi
 
 **Incorrect: 2 iterations, intermediate array**
 
-```typescript
+```text
 const userNames = users
   .map(user => user.isActive ? user.name : null)
   .filter(Boolean)
@@ -3496,7 +3496,7 @@ const userNames = users
 
 **Correct: 1 iteration, no intermediate array**
 
-```typescript
+```text
 const userNames = users.flatMap(user =>
   user.isActive ? [user.name] : []
 )
@@ -3504,7 +3504,7 @@ const userNames = users.flatMap(user =>
 
 **More examples:**
 
-```typescript
+```text
 // Extract valid emails from responses
 // Before
 const emails = responses
@@ -3545,7 +3545,7 @@ Finding the smallest or largest element only requires a single pass through the 
 
 **Incorrect (O(n log n) - sort to find latest):**
 
-```typescript
+```text
 interface Project {
   id: string
   name: string
@@ -3562,7 +3562,7 @@ Sorts the entire array just to find the maximum value.
 
 **Incorrect (O(n log n) - sort for oldest and newest):**
 
-```typescript
+```text
 function getOldestAndNewest(projects: Project[]) {
   const sorted = [...projects].sort((a, b) => a.updatedAt - b.updatedAt)
   return { oldest: sorted[0], newest: sorted[sorted.length - 1] }
@@ -3573,7 +3573,7 @@ Still sorts unnecessarily when only min/max are needed.
 
 **Correct (O(n) - single loop):**
 
-```typescript
+```text
 function getLatestProject(projects: Project[]) {
   if (projects.length === 0) return null
   
@@ -3607,7 +3607,7 @@ Single pass through the array, no copying, no sorting.
 
 **Alternative: Math.min/Math.max for small arrays**
 
-```typescript
+```text
 const numbers = [5, 2, 8, 1, 9]
 const min = Math.min(...numbers)
 const max = Math.max(...numbers)
@@ -3623,14 +3623,14 @@ Convert arrays to Set/Map for repeated membership checks.
 
 **Incorrect (O(n) per check):**
 
-```typescript
+```text
 const allowedIds = ['a', 'b', 'c', ...]
 items.filter(item => allowedIds.includes(item.id))
 ```
 
 **Correct (O(1) per check):**
 
-```typescript
+```text
 const allowedIds = new Set(['a', 'b', 'c', ...])
 items.filter(item => allowedIds.has(item.id))
 ```
@@ -3643,7 +3643,7 @@ items.filter(item => allowedIds.has(item.id))
 
 **Incorrect: mutates original array**
 
-```typescript
+```text
 function UserList({ users }: { users: User[] }) {
   // Mutates the users prop array!
   const sorted = useMemo(
@@ -3656,7 +3656,7 @@ function UserList({ users }: { users: User[] }) {
 
 **Correct: creates new array**
 
-```typescript
+```text
 function UserList({ users }: { users: User[] }) {
   // Creates new sorted array, original unchanged
   const sorted = useMemo(
@@ -3675,7 +3675,7 @@ function UserList({ users }: { users: User[] }) {
 
 **Browser support: fallback for older browsers**
 
-```typescript
+```text
 // Fallback for older browsers
 const sorted = [...items].sort((a, b) => a.value - b.value)
 ```
@@ -3708,7 +3708,7 @@ Effect Event functions do not have a stable identity. Their identity intentional
 
 **Incorrect: Effect Event added as a dependency**
 
-```tsx
+```text
 import { useEffect, useEffectEvent } from 'react'
 
 function ChatRoom({ roomId, onConnected }: {
@@ -3731,7 +3731,7 @@ Including the Effect Event in dependencies makes the effect re-run every render 
 
 **Correct: depend on reactive values, not the Effect Event**
 
-```tsx
+```text
 import { useEffect, useEffectEvent } from 'react'
 
 function ChatRoom({ roomId, onConnected }: {
@@ -3760,7 +3760,7 @@ Do not put app-wide initialization that must run once per app load inside `useEf
 
 **Incorrect: runs twice in dev, re-runs on remount**
 
-```tsx
+```text
 function Comp() {
   useEffect(() => {
     loadFromStorage()
@@ -3773,7 +3773,7 @@ function Comp() {
 
 **Correct: once per app load**
 
-```tsx
+```text
 let didInit = false
 
 function Comp() {
@@ -3798,7 +3798,7 @@ Store callbacks in refs when used in effects that shouldn't re-subscribe on call
 
 **Incorrect: re-subscribes on every render**
 
-```tsx
+```text
 function useWindowEvent(event: string, handler: (e) => void) {
   useEffect(() => {
     window.addEventListener(event, handler)
@@ -3809,7 +3809,7 @@ function useWindowEvent(event: string, handler: (e) => void) {
 
 **Correct: stable subscription**
 
-```tsx
+```text
 import { useEffectEvent } from 'react'
 
 function useWindowEvent(event: string, handler: (e) => void) {
@@ -3834,7 +3834,7 @@ Access latest values in callbacks without adding them to dependency arrays. Prev
 
 **Incorrect: effect re-runs on every callback change**
 
-```tsx
+```text
 function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
   const [query, setQuery] = useState('')
 
@@ -3847,7 +3847,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 
 **Correct: using React's useEffectEvent**
 
-```tsx
+```text
 import { useEffectEvent } from 'react';
 
 function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
