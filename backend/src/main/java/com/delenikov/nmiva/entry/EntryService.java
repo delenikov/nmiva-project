@@ -83,7 +83,7 @@ public class EntryService {
   @Transactional(readOnly = true)
   public List<ReminderResponse> upcomingReminders(Long userId) {
     LocalDate today = LocalDate.now();
-    LocalDate next30 = today.plusDays(30);
+    LocalDate next30 = today.plusDays(365);
     return entryRepository.findByUserIdAndTypeAndDeletedFalseAndCompletedFalse(userId, EntryType.REMINDER).stream()
         .map(entry -> toReminderResponse(entry, reminderDueService.resolveEffectiveDueDate(entry, today), today))
         .filter(reminder -> reminder.effectiveDueDate() != null

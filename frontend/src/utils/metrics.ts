@@ -1,10 +1,10 @@
 import type { EntryRecord } from '../types/models'
 
-const asNumber = (value: number | undefined): number | null => value === undefined ? null : Number(value)
+const asNumber = (value: number | null | undefined): number | null => value == null ? null : Number(value)
 
 export function calculateFuelMetrics(entries: EntryRecord[]): { latest?: number; average?: number } {
   const refuels = entries
-    .filter((entry) => !entry.deleted && entry.type === 'refuel' && entry.isFullTank && entry.odometer !== undefined && entry.liters !== undefined)
+    .filter((entry) => !entry.deleted && entry.type === 'refuel' && entry.isFullTank && entry.odometer != null && entry.liters != null)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   if (refuels.length < 2) {

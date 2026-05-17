@@ -18,7 +18,7 @@ public class UserSettingsService {
   @Transactional
   public UserSettingsResponse update(Long userId, UpdateSettingsRequest request) {
     UserSettings settings = repository.findByUserId(userId).orElseGet(() -> createDefault(userId));
-    settings.setCurrency(request.currency().trim().toUpperCase());
+    settings.setCurrency(request.currency().trim());
     settings.setPushEnabled(request.pushEnabled() == null || request.pushEnabled());
     settings = repository.save(settings);
     return new UserSettingsResponse(settings.getCurrency(), settings.isPushEnabled());
@@ -27,7 +27,7 @@ public class UserSettingsService {
   private UserSettings createDefault(Long userId) {
     UserSettings settings = new UserSettings();
     settings.setUserId(userId);
-    settings.setCurrency("EUR");
+    settings.setCurrency("мкд");
     settings.setPushEnabled(true);
     return repository.save(settings);
   }
