@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
-import { Car, CheckCircle2, History, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Car, CheckCircle2, Pencil, Plus, Timeline as TimelineIcon, Trash2 } from 'lucide-react'
 import { useAppContext } from '../context/AppContext'
 import { Badge } from '../components/ui/badge'
 import { Button, buttonVariants } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { EmptyState } from '../components/ui/empty-state'
+import { StatusPill } from '../components/ui/status-pill'
+import { formatKilometers } from '../utils/units'
+import { getSyncStatusMeta } from '../utils/status'
 
 export function VehiclesPage() {
   const { vehicles, activeVehicleLocalId, setActiveVehicle, deleteVehicle } = useAppContext()
@@ -15,7 +18,7 @@ export function VehiclesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-3xl font-semibold tracking-[-0.03em] text-slate-950">Garage</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">Manage profiles, pick the default for new entries, and review history.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Manage profiles, pick the default for new entries, and open each vehicle timeline.</p>
         </div>
         <Link className={buttonVariants({ size: 'lg' })} to="/app/vehicles/new">
           <Plus className="h-4 w-4" aria-hidden="true" />
@@ -47,9 +50,9 @@ export function VehiclesPage() {
                     <CardTitle className="truncate text-lg">{vehicle.brand} {vehicle.model}</CardTitle>
                     {activeVehicleLocalId === vehicle.localId ? <Badge variant="success">Current</Badge> : null}
                   </div>
-                  <CardDescription className="pl-11">{vehicle.year} / {vehicle.fuelType} / ODO {vehicle.odometerStart}</CardDescription>
+                  <CardDescription className="pl-11">{vehicle.year} / {vehicle.fuelType} / ODO {formatKilometers(vehicle.odometerStart)}</CardDescription>
                 </div>
-                <Badge variant="neutral">Sync: {vehicle.syncStatus}</Badge>
+                <VehicleSyncStatus syncStatus={vehicle.syncStatus} />
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -60,8 +63,8 @@ export function VehiclesPage() {
                     </Button>
                   ) : null}
                   <Link className={buttonVariants({ variant: 'secondary' })} to={`/app/vehicles/${vehicle.localId}`}>
-                    <History className="h-4 w-4" aria-hidden="true" />
-                    History
+                    <TimelineIcon className="h-4 w-4" aria-hidden="true" />
+                    Timeline
                   </Link>
                   <Link className={buttonVariants({ variant: 'secondary' })} to={`/app/vehicles/${vehicle.localId}/edit`}>
                     <Pencil className="h-4 w-4" aria-hidden="true" />
@@ -78,5 +81,15 @@ export function VehiclesPage() {
         </div>
       )}
     </div>
+  )
+}
+
+function VehicleSyncStatus({ syncStatus }: { syncStatus: Parameters<typeof getSyncStatusMeta>[0] }) {
+  const meta = getSyncStatusMeta(syncStatus)
+
+  return (
+    <StatusPill tone={meta.tone} prefix="Sync" compact>
+      {meta.label}
+    </StatusPill>
   )
 }

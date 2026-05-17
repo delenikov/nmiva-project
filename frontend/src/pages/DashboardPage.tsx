@@ -8,6 +8,7 @@ import { buttonVariants } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { EmptyState } from '../components/ui/empty-state'
 import { formatMoneyValue } from '../utils/currency'
+import { formatKilometers } from '../utils/units'
 
 type ReminderDisplayItem = {
   localId: string
@@ -140,7 +141,7 @@ export function DashboardPage() {
           {[
             { label: 'Spent this month', value: formatMoneyValue(totals.month), icon: WalletCards },
             { label: 'Spent all time', value: formatMoneyValue(totals.all), icon: WalletCards },
-            { label: 'Latest odometer', value: latestOdometer ?? '-', icon: Gauge },
+            { label: 'Latest odometer', value: formatKilometers(latestOdometer), icon: Gauge },
             { label: 'Latest L/100km', value: fuel.latest ?? '-', icon: Fuel },
             { label: 'Average L/100km', value: fuel.average ?? '-', icon: Fuel },
             { label: 'Open reminders', value: reminders.upcoming.length + reminders.overdue.length, icon: Bell }

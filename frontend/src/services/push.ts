@@ -76,6 +76,7 @@ export async function subscribeToPush(token: string): Promise<'subscribed'> {
   }
 
   const permission = await Notification.requestPermission()
+  console.log(permission);
   if (permission !== 'granted') {
     throw new Error('Notification permission was not granted')
   }

@@ -1,13 +1,17 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Car, LayoutDashboard, Plus, Settings, Wifi, WifiOff } from 'lucide-react'
+import { Car, LayoutDashboard, Plus, Settings, Timeline as TimelineIcon, Wifi, WifiOff } from 'lucide-react'
 import { useAppContext } from '../context/AppContext'
-import { Badge } from './ui/badge'
+import { StatusPill } from './ui/status-pill'
 import { cn } from '../utils/cn'
+import { getConnectionStatusMeta, getPendingSyncStatusMeta } from '../utils/status'
 
 export function AppShell() {
   const { vehicles, activeVehicleLocalId, pendingSyncCount, isOnline } = useAppContext()
   const { pathname } = useLocation()
   const activeVehicle = vehicles.find((vehicle) => vehicle.localId === activeVehicleLocalId && !vehicle.deleted) ?? null
+  const timelineHref = activeVehicle ? `/app/vehicles/${activeVehicle.localId}` : '/app/vehicles'
+  const connectionStatus = getConnectionStatusMeta(isOnline)
+  const syncStatus = getPendingSyncStatusMeta(pendingSyncCount)
   const pageTitle = getPageTitle(pathname)
   const navLinkClass = ({ isActive }: { isActive: boolean }) => cn(
     'flex min-h-10 items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]',
@@ -37,17 +41,21 @@ export function AppShell() {
             <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
             Dashboard
           </NavLink>
-          <NavLink to="/app/vehicles" className={navLinkClass}>
+          <NavLink to={timelineHref} end className={activeVehicle ? navLinkClass : () => navLinkClass({ isActive: false })}>
+            <TimelineIcon className="h-4 w-4" aria-hidden="true" />
+            Timeline
+          </NavLink>
+          <Link
+              to={activeVehicle ? `/app/vehicles/${activeVehicle.localId}/add-entry` : '/app/vehicles/new'}
+              className="flex min-h-10 items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Add entry
+          </Link>
+          <NavLink to="/app/vehicles" end className={navLinkClass}>
             <Car className="h-4 w-4" aria-hidden="true" />
             Garage
           </NavLink>
-          <Link
-            to={activeVehicle ? `/app/vehicles/${activeVehicle.localId}/add-entry` : '/app/vehicles/new'}
-            className="flex min-h-10 items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            Add
-          </Link>
           <NavLink to="/app/settings" className={navLinkClass}>
             <Settings className="h-4 w-4" aria-hidden="true" />
             Settings
@@ -71,13 +79,13 @@ export function AppShell() {
               </h1>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
-              <Badge variant={isOnline ? 'success' : 'danger'} className="gap-1.5">
+              <StatusPill tone={connectionStatus.tone} compact>
                 {isOnline ? <Wifi className="h-3.5 w-3.5" aria-hidden="true" /> : <WifiOff className="h-3.5 w-3.5" aria-hidden="true" />}
-                {isOnline ? 'Online' : 'Offline'}
-              </Badge>
-              <Badge variant={pendingSyncCount > 0 ? 'warning' : 'neutral'}>
-                Sync: {pendingSyncCount > 0 ? `${pendingSyncCount} pending` : 'synced'}
-              </Badge>
+                {connectionStatus.label}
+              </StatusPill>
+              <StatusPill tone={syncStatus.tone} prefix="Sync" compact>
+                {syncStatus.label}
+              </StatusPill>
             </div>
           </div>
         </header>
@@ -87,25 +95,29 @@ export function AppShell() {
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-[color:var(--border)] bg-white/95 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-[color:var(--border)] bg-white/95 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden">
         <NavLink to="/app" end className={mobileNavLinkClass}>
           <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden min-[360px]:inline">Dashboard</span>
+          <span className="hidden min-[390px]:inline">Home</span>
         </NavLink>
-        <NavLink to="/app/vehicles" className={mobileNavLinkClass}>
-          <Car className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden min-[360px]:inline">Garage</span>
+        <NavLink to={timelineHref} end className={activeVehicle ? mobileNavLinkClass : () => mobileNavLinkClass({ isActive: false })}>
+          <TimelineIcon className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden min-[390px]:inline">Timeline</span>
         </NavLink>
         <Link
-          to={activeVehicle ? `/app/vehicles/${activeVehicle.localId}/add-entry` : '/app/vehicles/new'}
-          className="flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
+            to={activeVehicle ? `/app/vehicles/${activeVehicle.localId}/add-entry` : '/app/vehicles/new'}
+            className="flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden min-[360px]:inline">Add</span>
+          <span className="hidden min-[390px]:inline">Add entry</span>
         </Link>
+        <NavLink to="/app/vehicles" end className={mobileNavLinkClass}>
+          <Car className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden min-[390px]:inline">Garage</span>
+        </NavLink>
         <NavLink to="/app/settings" className={mobileNavLinkClass}>
           <Settings className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden min-[360px]:inline">Settings</span>
+          <span className="hidden min-[390px]:inline">Settings</span>
         </NavLink>
       </nav>
     </div>
@@ -136,7 +148,7 @@ function getPageTitle(pathname: string): string {
   }
 
   if (normalizedPath.startsWith('/app/vehicles/')) {
-    return 'History'
+    return 'Timeline'
   }
 
   if (normalizedPath === '/app/settings') {
